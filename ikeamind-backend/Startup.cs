@@ -79,7 +79,8 @@ namespace ikeamind_backend
 
             app.UseSpa(builder =>
             {
-
+                if (env.IsDevelopment())
+                    builder.UseProxyToSpaDevelopmentServer("http://localhost:3000/");
             });
         }
     }
