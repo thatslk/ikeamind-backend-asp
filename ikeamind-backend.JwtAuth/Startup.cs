@@ -2,17 +2,15 @@ using ikeamind_backend.Core.ExtensionsMethods;
 using ikeamind_backend.Core.Interfaces;
 using ikeamind_backend.Core.Services;
 using ikeamind_backend.Infrastructure;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 
-namespace ikeamind_backend
+namespace ikeamind_backend.JwtAuth
 {
     public class Startup
     {
@@ -25,36 +23,16 @@ namespace ikeamind_backend
 
         public void ConfigureServices(IServiceCollection services)
         {
+
             services.AddControllers();
 
-            var authOptionsConfiguration = Configuration.GetSection("Auth").Get<AuthOptions>();
+            var authOptionsConfiguration = Configuration.GetSection("Auth");
+            services.Configure<AuthOptions>(authOptionsConfiguration);
 
-            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                .AddJwtBearer(options =>
-                {
-                    options.RequireHttpsMetadata = false;
-                    options.TokenValidationParameters = new TokenValidationParameters
-                    {
-                        ValidateIssuer = true,
-                        ValidIssuer = authOptionsConfiguration.Issuer,
 
-                        ValidateAudience = true,
-                        ValidAudience = authOptionsConfiguration.Audience,
-
-                        ValidateLifetime = true,
-
-                        IssuerSigningKey = authOptionsConfiguration.GetSymmetricSecurityKey(),
-                        ValidateIssuerSigningKey = true
-                    };
-                });
-
-            services.AddSpaStaticFiles(config =>
-            {
-                config.RootPath = "dist";
-            });
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "ikeamind_backend", Version = "v1" });
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "ikeamind_backend.JwtAuth", Version = "v1" });
             });
 
             services.AddCors(config =>
@@ -64,6 +42,7 @@ namespace ikeamind_backend
                     .AllowAnyMethod()
                     .AllowAnyHeader());
             });
+
 
             services.AddDbContext<IkeaProductsContext>(
                 options => {
@@ -92,36 +71,24 @@ namespace ikeamind_backend
             services.AddCoreInjections();
         }
 
-
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
                 app.UseSwagger();
-                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "ikeamind_backend v1"));
+                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "ikeamind_backend.JwtAuth v1"));
             }
 
-            //app.UseCors("AllowAll");
-
-            //app.UseHttpsRedirection();
+            app.UseHttpsRedirection();
 
             app.UseRouting();
 
-            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
-            });
-
-            app.UseSpaStaticFiles();
-
-            app.UseSpa(builder =>
-            {
-                if (env.IsDevelopment())
-                    builder.UseProxyToSpaDevelopmentServer("http://localhost:3000/");
             });
         }
     }

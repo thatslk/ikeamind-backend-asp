@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace ikeamind_backend.Core.CQRS.Queries.GetNextRandomProducts
 {
-    public class GetNextRandomProductsQuery: IRequest<List<AbstractIkeaProduct>>
+    public class GetNextRandomProductsQuery : IRequest<List<AbstractIkeaProduct>>
     {
         public int Amount { get; set; }
         public DBLocalesEnum Locale{ get; set; }
