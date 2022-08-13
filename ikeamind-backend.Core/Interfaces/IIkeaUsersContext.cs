@@ -10,6 +10,5 @@ namespace ikeamind_backend.Core.Interfaces
         Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
         DbSet<Avatar> Avatars { get; set; }
         DbSet<User> Users { get; set; }
-
     }
 }

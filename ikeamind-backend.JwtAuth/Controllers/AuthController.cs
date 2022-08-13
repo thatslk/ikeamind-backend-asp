@@ -1,4 +1,4 @@
-﻿using ikeamind_backend.Core.CQRS.Queries.AuthenticateUser;
+﻿using ikeamind_backend.Core.CQRS.Queries.UserQueries.AuthenticateUser;
 using ikeamind_backend.Core.Models.EFModels.AccountModels;
 using ikeamind_backend.Core.Services;
 using MediatR;

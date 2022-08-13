@@ -1,4 +1,4 @@
-﻿using ikeamind_backend.Core.CQRS.Queries.GetNextRandomProducts;
+﻿using ikeamind_backend.Core.CQRS.Queries.IkeaProductQueries.GetNextRandomProducts;
 using ikeamind_backend.Core.Enums;
 using ikeamind_backend.Core.Models.ReturnModels;
 using MediatR;

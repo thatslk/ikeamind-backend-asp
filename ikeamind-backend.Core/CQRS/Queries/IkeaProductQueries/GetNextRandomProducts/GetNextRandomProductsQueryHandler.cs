@@ -9,7 +9,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace ikeamind_backend.Core.CQRS.Queries.GetNextRandomProducts
+namespace ikeamind_backend.Core.CQRS.Queries.IkeaProductQueries.GetNextRandomProducts
 {
     public class GetNextRandomProductsQuery : IRequest<List<AbstractIkeaProduct>>
     {

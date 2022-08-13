@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace ikeamind_backend.Core.CQRS.Queries.AuthenticateUser
+namespace ikeamind_backend.Core.CQRS.Queries.UserQueries.AuthenticateUser
 {
     public class AuthenticateUserQuery : IRequest<Account>
     {

@@ -102,7 +102,7 @@ namespace ikeamind_backend
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "ikeamind_backend v1"));
             }
 
-            //app.UseCors("AllowAll");
+            app.UseCors("AllowAll");
 
             //app.UseHttpsRedirection();
 
