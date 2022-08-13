@@ -1,7 +1,10 @@
-﻿using ikeamind_backend.Core.CQRS.Commands.UserCommands.SetUserAvatar;
+﻿using ikeamind_backend.Core.CQRS.Commands.UserCommands.IncrementBestscore;
+using ikeamind_backend.Core.CQRS.Commands.UserCommands.SetUserAvatar;
 using ikeamind_backend.Core.CQRS.Commands.UserCommands.SetUserName;
 using ikeamind_backend.Core.CQRS.Queries.UserQueries.AccountPage;
+using ikeamind_backend.Core.CQRS.Queries.UserQueries.GetBestscores;
 using ikeamind_backend.Core.CQRS.Queries.UserQueries.GetUserAvatar;
+using ikeamind_backend.Core.Enums;
 using ikeamind_backend.Core.Models.ReturnModels;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -63,6 +66,33 @@ namespace ikeamind_backend.Controllers
             else
                 return Ok();
         }
+
+        [HttpPost("[action]")]
+        [Authorize]
+        public async Task<IActionResult> IncrementBestscore(string mode)
+        {
+            var userId = Guid.Parse(User.Claims.Single(x => x.Type == ClaimTypes.NameIdentifier).Value);
+            var resultOfParsing = Enum.TryParse(mode, out GameModesEnum gameMode);
+            if (resultOfParsing)
+            {
+                await _mediator.Send(new IncrementBestscoreCommand { UserId = userId, GameMode = gameMode });
+                return Ok();
+            }
+            else
+            {
+                return BadRequest();
+            }
+
+        }
+
+        [HttpGet("[action]")]
+        [Authorize]
+        public async Task<IActionResult> GetBestscores()
+        {
+            var userId = Guid.Parse(User.Claims.Single(x => x.Type == ClaimTypes.NameIdentifier).Value);
+            return Ok(new GetBestscoresRM { Bestscores = await _mediator.Send(new GetBestscoresQuery { UserId = userId }) });
+        }
+
 
     }
 }
