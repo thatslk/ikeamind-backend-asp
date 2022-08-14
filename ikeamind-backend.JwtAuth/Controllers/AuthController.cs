@@ -1,4 +1,6 @@
 ﻿using ikeamind_backend.Core.CQRS.Queries.UserQueries.AuthenticateUser;
+using ikeamind_backend.Core.CQRS.Queries.UserQueries.CreateUser;
+using ikeamind_backend.Core.CQRS.Queries.UserQueries.IsUsernameTaken;
 using ikeamind_backend.Core.Models.EFModels.AccountModels;
 using ikeamind_backend.Core.Services;
 using MediatR;
@@ -29,13 +31,37 @@ namespace ikeamind_backend.JwtAuth.Controllers
         [HttpPost("[action]")]
         public async Task<IActionResult> Login(string username, string password)
         {
-            var user = await _mediator.Send(new AuthenticateUserQuery { Username = username, Password = password });
-            if (user == null)
+            if(username.Contains(' '))
             {
-                return BadRequest();
+                return BadRequest("Пробелы в имени пользователя не поддерживаются");
             }
 
-            var token = GenerateJWT(user);
+            var account = await _mediator.Send(new AuthenticateUserQuery { Username = username, Password = password });
+            if (account == null)
+            {
+                return BadRequest("Пользователь с таким данными не найден");
+            }
+
+            var token = GenerateJWT(account);
+            return Ok(token);
+        }
+
+        [HttpPost("[action]")]
+        public async Task<IActionResult> Signup(string username, string password)
+        {
+            if (username.Contains(' '))
+            {
+                return BadRequest("Пробелы в имени пользователя не поддерживаются");
+            }
+
+            if (await _mediator.Send(new IsUsernameTakenQuery { Username = username }))
+            {
+                return BadRequest("Пользовтель с указанным логином уже существует");
+            }
+
+            var createdAccount = await _mediator.Send(new CreateUserQuery { Username = username, Password = password });
+
+            var token = GenerateJWT(createdAccount);
             return Ok(token);
         }
 
