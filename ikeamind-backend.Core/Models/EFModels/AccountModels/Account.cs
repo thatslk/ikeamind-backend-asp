@@ -9,5 +9,8 @@ namespace ikeamind_backend.Core.Models.EFModels.AccountModels
         public string Username { get; set; }
         [Required]
         public string Password { get; set; }
+        public string RefreshToken { get; set; }
+        public string RefreshTokenCreated { get; set; }
+        public string RefreshTokenExpires { get; set; }
     }
 }

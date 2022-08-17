@@ -1,15 +1,18 @@
-﻿using ikeamind_backend.Core.CQRS.Queries.UserQueries.AuthenticateUser;
+﻿using ikeamind_backend.Core.CQRS.Commands.UserCommands.SetUserTokens;
+using ikeamind_backend.Core.CQRS.Commands.UserCommands.SilentRefresh;
+using ikeamind_backend.Core.CQRS.Queries.UserQueries.AuthenticateUser;
 using ikeamind_backend.Core.CQRS.Queries.UserQueries.CreateUser;
 using ikeamind_backend.Core.CQRS.Queries.UserQueries.IsUsernameTaken;
 using ikeamind_backend.Core.Models.EFModels.AccountModels;
 using ikeamind_backend.Core.Services;
 using MediatR;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System;
-using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
@@ -42,8 +45,8 @@ namespace ikeamind_backend.JwtAuth.Controllers
                 return BadRequest("Пользователь с таким данными не найден");
             }
 
-            var token = GenerateJWT(account);
-            return Ok(token);
+            var tokens = await _mediator.Send(new SetUserTokensCommand { UserId = Guid.Parse(account.Id) });
+            return Ok(tokens);
         }
 
         [HttpPost("[action]")]
@@ -61,31 +64,56 @@ namespace ikeamind_backend.JwtAuth.Controllers
 
             var createdAccount = await _mediator.Send(new CreateUserQuery { Username = username, Password = password });
 
-            var token = GenerateJWT(createdAccount);
-            return Ok(token);
+            var tokens = await _mediator.Send(new SetUserTokensCommand { UserId = Guid.Parse(createdAccount.Id) });
+            return Ok(tokens);
         }
 
-        private string GenerateJWT(Account user)
+        [HttpPost("[action]")]
+        public async Task<IActionResult> SilentRefresh(string accessToken, string refreshToken)
         {
-            var authParams = _authOptions.Value;
-
-            var securityKey = authParams.GetSymmetricSecurityKey();
-            var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
-
-            var claims = new List<Claim>
+            if((accessToken == null) || (refreshToken == null))
             {
-                new Claim(JwtRegisteredClaimNames.Name, user.Username),
-                new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
+                return BadRequest();
+            }
+
+            var principal = GetPrincipalFromExpiredToken(accessToken);
+            if (principal == null)
+            {
+                return BadRequest();
+            }
+
+            var userId = Guid.Parse(principal.Claims.Single(x => x.Type == ClaimTypes.NameIdentifier).Value);
+            var tokens = await _mediator.Send(new SilentRefreshCommand { UserId = userId, RefreshToken = refreshToken });
+
+            if(tokens == null)
+            {
+                return Unauthorized();
+            }
+
+            return Ok(tokens);
+
+        }
+
+        private ClaimsPrincipal GetPrincipalFromExpiredToken(string token)
+        {
+            var tokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateAudience = false,
+                ValidateIssuer = false,
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = _authOptions.Value.GetSymmetricSecurityKey(),
+                ValidateLifetime = false
             };
 
-            var token = new JwtSecurityToken
-                (authParams.Issuer,
-                authParams.Audience,
-                claims,
-                expires: DateTime.Now.AddSeconds(authParams.TokenLifetimeInSeconds),
-                signingCredentials: credentials);
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var principal = tokenHandler.ValidateToken(token, tokenValidationParameters, out SecurityToken securityToken);
+            if (securityToken is not JwtSecurityToken jwtSecurityToken || !jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
+                throw new SecurityTokenException("Invalid token");
 
-            return new JwtSecurityTokenHandler().WriteToken(token);
+            return principal;
+
         }
+
+
     }
 }

@@ -4,6 +4,7 @@ using ikeamind_backend.Core.Services;
 using ikeamind_backend.Infrastructure;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -28,6 +29,14 @@ namespace ikeamind_backend.JwtAuth
 
             var authOptionsConfiguration = Configuration.GetSection("Auth");
             services.Configure<AuthOptions>(authOptionsConfiguration);
+
+            services.Configure<CookiePolicyOptions>(options =>
+            {
+                // This lambda determines whether user consent for non-essential cookies is needed for a given request.
+                options.CheckConsentNeeded = context => true;
+                options.MinimumSameSitePolicy = SameSiteMode.None;
+                options.Secure = CookieSecurePolicy.Always;
+            });
 
 
             services.AddSwaggerGen(c =>
@@ -83,6 +92,7 @@ namespace ikeamind_backend.JwtAuth
             app.UseCors("AllowAll");
 
             app.UseHttpsRedirection();
+            app.UseCookiePolicy();
 
             app.UseRouting();
 
