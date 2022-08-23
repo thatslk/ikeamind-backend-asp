@@ -19,41 +19,46 @@ namespace ikeamind_backend.Core.CQRS.Queries.UserQueries.AccountPage
     public class AccountPageQueryHandler
         : IRequestHandler<AccountPageQuery, AccountPageRM>
     {
-        protected readonly IIkeaUsersContext db;
-        public AccountPageQueryHandler(IIkeaUsersContext context)
+        protected readonly IIkeaProductsAndUsersContext db;
+        public AccountPageQueryHandler(IIkeaProductsAndUsersContext context)
         {
             db = context;
         }
 
         public async Task<AccountPageRM> Handle(AccountPageQuery request, CancellationToken cancellationToken)
         {
-            var user = await db.Users.SingleAsync(x => x.Id == request.UserId.ToString());
+            var user = await db.Users.SingleAsync(x => x.Id == request.UserId);
 
             var avatars = new List<AvatarDTO>();
-            foreach(var avatar in db.Avatars)
+            foreach(var avatar in db.Avatars.ToList())
             {
+                var avatarDescriptions = new Dictionary<string, string>();
+                foreach (var avatarDescription in db.AvatarDescriptionByLocales.Where(x => x.AvatarId == avatar.Id))
+                {
+                    avatarDescriptions.Add(avatarDescription.LocaleCode, avatarDescription.Description);
+                }
+
                 var toAdd = new AvatarDTO
                 {
-                    AvatarId = (int)avatar.Id,
+                    AvatarId = avatar.Id,
                     AvatarName = avatar.Title,
-                    AvatarDescriptionByLocales = new Dictionary<string, string>
-                    {
-                        { "ru", avatar.Description }
-                    },
+                    AvatarDescriptionByLocales = avatarDescriptions,
                     AvatarImageUrl = avatar.ImageUrl
                 };
 
                 avatars.Add(toAdd);
             }
 
+            avatars = avatars.OrderBy(a => a.AvatarId).ToList();
+
             var toReturn = new AccountPageRM
             {
-                UserId = Guid.Parse(user.Id),
+                UserId = user.Id,
                 Username = user.Username,
-                TitleFirstBestscore = (int)user.BestscoreIf,
-                PictureFirstBestscore = (int)user.BescorePf,
+                TitleFirstBestscore = (int)user.BestscoreTf,
+                PictureFirstBestscore = (int)user.BestscorePf,
                 Avatars = avatars,
-                CurrentAvatarId = (int)user.AvatarId,
+                CurrentAvatarId = user.AvatarId,
             };
 
             return toReturn;

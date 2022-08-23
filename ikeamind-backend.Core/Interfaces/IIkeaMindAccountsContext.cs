@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace ikeamind_backend.Core.Interfaces
 {
-    public interface IIkeaAccountsContext
+    public interface IIkeaMindAccountsContext
     {
         Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
         DbSet<Account> Accounts { get; set; }

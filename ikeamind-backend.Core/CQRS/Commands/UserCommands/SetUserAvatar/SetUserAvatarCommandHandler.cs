@@ -17,8 +17,8 @@ namespace ikeamind_backend.Core.CQRS.Commands.UserCommands.SetUserAvatar
     public class SetUserAvatarCommandHandler
         : IRequestHandler<SetUserAvatarCommand, bool>
     {
-        protected readonly IIkeaUsersContext db;
-        public SetUserAvatarCommandHandler(IIkeaUsersContext context)
+        protected readonly IIkeaProductsAndUsersContext db;
+        public SetUserAvatarCommandHandler(IIkeaProductsAndUsersContext context)
         {
             db = context;
         }
@@ -31,7 +31,7 @@ namespace ikeamind_backend.Core.CQRS.Commands.UserCommands.SetUserAvatar
             }
 
             var user = await(from u in db.Users
-                             where u.Id == request.UserId.ToString()
+                             where u.Id == request.UserId
                              select u).SingleOrDefaultAsync();
 
             user.AvatarId = request.NewAvatarId;

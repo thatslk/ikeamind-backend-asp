@@ -4,13 +4,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ikeamind_backend.Infrastructure
 {
-    public class IkeaJwtAccountsContext : DbContext, IIkeaAccountsContext
+    public partial class IkeaMindAccountsContext : DbContext, IIkeaMindAccountsContext
     {
-        public IkeaJwtAccountsContext()
+        public IkeaMindAccountsContext()
         {
         }
 
-        public IkeaJwtAccountsContext(DbContextOptions<IkeaJwtAccountsContext> options)
+        public IkeaMindAccountsContext(DbContextOptions<IkeaMindAccountsContext> options)
             : base(options)
         {
         }
@@ -25,12 +25,20 @@ namespace ikeamind_backend.Infrastructure
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.HasAnnotation("ProductVersion", "2.2.6-servicing-10079");
+            modelBuilder.HasAnnotation("Relational:Collation", "Russian_Russia.1251");
 
             modelBuilder.Entity<Account>(entity =>
             {
                 entity.Property(e => e.Id).ValueGeneratedNever();
+
+                entity.Property(e => e.Password).IsRequired();
+
+                entity.Property(e => e.Username).IsRequired();
             });
+
+            OnModelCreatingPartial(modelBuilder);
         }
+
+        partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
     }
 }

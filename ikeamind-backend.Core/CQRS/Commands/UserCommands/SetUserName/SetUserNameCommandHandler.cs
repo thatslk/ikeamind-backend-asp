@@ -16,11 +16,11 @@ namespace ikeamind_backend.Core.CQRS.Commands.UserCommands.SetUserName
     public class SetUserNameCommandHandler
         : IRequestHandler<SetUserNameCommand, bool>
     {
-        protected readonly IIkeaUsersContext usersDb;
-        protected readonly IIkeaAccountsContext accountsDb;
+        protected readonly IIkeaProductsAndUsersContext usersDb;
+        protected readonly IIkeaMindAccountsContext accountsDb;
         public SetUserNameCommandHandler
-            (IIkeaUsersContext userContext,
-            IIkeaAccountsContext accountsContext)
+            (IIkeaProductsAndUsersContext userContext,
+            IIkeaMindAccountsContext accountsContext)
         {
             usersDb = userContext;
             accountsDb = accountsContext;
@@ -33,8 +33,8 @@ namespace ikeamind_backend.Core.CQRS.Commands.UserCommands.SetUserName
                 return false;
             }
 
-            var account = await accountsDb.Accounts.SingleOrDefaultAsync(x => x.Id == request.UserId.ToString());
-            var user = await usersDb.Users.SingleOrDefaultAsync(x => x.Id == request.UserId.ToString());
+            var account = await accountsDb.Accounts.SingleOrDefaultAsync(x => x.Id == request.UserId);
+            var user = await usersDb.Users.SingleOrDefaultAsync(x => x.Id == request.UserId);
 
             user.Username = request.NewUserName;
             account.Username = request.NewUserName;

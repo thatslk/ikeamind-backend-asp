@@ -21,7 +21,7 @@ namespace ikeamind_backend.Core.CQRS.Queries.IkeaProductQueries.GetNextRandomPro
         : AbstractCQRSHandler, IRequestHandler<GetNextRandomProductsQuery, List<AbstractIkeaProduct>>
     {
         public GetNextRandomProductsQueryHandler
-            (IIkeaDbContext context) : base(context) { }
+            (IIkeaProductsAndUsersContext context) : base(context) { }
 
         public async Task<List<AbstractIkeaProduct>> Handle(GetNextRandomProductsQuery request, CancellationToken cancellationToken)
         {
@@ -36,10 +36,10 @@ namespace ikeamind_backend.Core.CQRS.Queries.IkeaProductQueries.GetNextRandomPro
                     selectedTable = db.IkeaUs;
                     break;
                 case (DBLocalesEnum.se):
-                    selectedTable = db.IkeaSe;
+                    selectedTable = db.IkeaSes;
                     break;
                 case (DBLocalesEnum.ru):
-                    selectedTable = db.IkeaRu;
+                    selectedTable = db.IkeaRus;
                     break;
                 default:
                     selectedTable = db.IkeaUs;

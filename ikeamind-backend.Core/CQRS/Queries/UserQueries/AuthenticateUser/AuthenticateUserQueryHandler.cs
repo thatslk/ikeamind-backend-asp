@@ -16,8 +16,8 @@ namespace ikeamind_backend.Core.CQRS.Queries.UserQueries.AuthenticateUser
     public class AuthenticateUserQueryHandler
         : IRequestHandler<AuthenticateUserQuery, Account>
     {
-        protected readonly IIkeaAccountsContext db;
-        public AuthenticateUserQueryHandler(IIkeaAccountsContext context) 
+        protected readonly IIkeaMindAccountsContext db;
+        public AuthenticateUserQueryHandler(IIkeaMindAccountsContext context) 
         {
             db = context;
         }

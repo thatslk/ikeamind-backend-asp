@@ -16,19 +16,19 @@ namespace ikeamind_backend.Core.CQRS.Queries.UserQueries.GetBestscores
     public class GetBestscoresQueryHandler
         : IRequestHandler<GetBestscoresQuery, Dictionary<string, int>>
     {
-        protected readonly IIkeaUsersContext db;
-        public GetBestscoresQueryHandler(IIkeaUsersContext context)
+        protected readonly IIkeaProductsAndUsersContext db;
+        public GetBestscoresQueryHandler(IIkeaProductsAndUsersContext context)
         {
             db = context;
         }
 
         public async Task<Dictionary<string, int>> Handle(GetBestscoresQuery request, CancellationToken cancellationToken)
         {
-            var user = await db.Users.SingleOrDefaultAsync(x => x.Id == request.UserId.ToString());
+            var user = await db.Users.SingleOrDefaultAsync(x => x.Id == request.UserId);
             return new Dictionary<string, int>()
             {
-                { "tf_bestscore", (int)user.BestscoreIf },
-                { "pf_bestscore", (int)user.BescorePf },
+                { "tf_bestscore", (int)user.BestscoreTf },
+                { "pf_bestscore", (int)user.BestscorePf },
             };
         }
     }

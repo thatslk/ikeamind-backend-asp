@@ -14,8 +14,8 @@ namespace ikeamind_backend.Core.CQRS.Queries.UserQueries.IsUsernameTaken
     public class IsUsernameTakenQueryHandler
         : IRequestHandler<IsUsernameTakenQuery, bool>
     {
-        protected readonly IIkeaAccountsContext db;
-        public IsUsernameTakenQueryHandler(IIkeaAccountsContext context)
+        protected readonly IIkeaMindAccountsContext db;
+        public IsUsernameTakenQueryHandler(IIkeaMindAccountsContext context)
         {
             db = context;
         }

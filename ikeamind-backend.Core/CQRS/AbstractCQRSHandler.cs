@@ -4,8 +4,8 @@ namespace ikeamind_backend.Core.CQRS
 {
     public abstract class AbstractCQRSHandler
     {
-        protected readonly IIkeaDbContext db;
-        public AbstractCQRSHandler(IIkeaDbContext context)
+        protected readonly IIkeaProductsAndUsersContext db;
+        public AbstractCQRSHandler(IIkeaProductsAndUsersContext context)
         {
             db = context;
         }

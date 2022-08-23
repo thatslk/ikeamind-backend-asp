@@ -5,9 +5,6 @@ using ikeamind_backend.Core.Services;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -22,12 +19,12 @@ namespace ikeamind_backend.Core.CQRS.Commands.UserCommands.SilentRefresh
     public class SilentRefreshCommandHandler
         : IRequestHandler<SilentRefreshCommand, TokensRM>
     {
-        private readonly IIkeaAccountsContext accountsDb;
+        private readonly IIkeaMindAccountsContext accountsDb;
         private readonly TokenGenerators _tokenGenerators;
         private readonly IMediator _mediator;
 
         public SilentRefreshCommandHandler
-            (IIkeaAccountsContext accountsContext,
+            (IIkeaMindAccountsContext accountsContext,
             TokenGenerators tokenGenerators,
             IMediator mediator)
         {
@@ -38,7 +35,7 @@ namespace ikeamind_backend.Core.CQRS.Commands.UserCommands.SilentRefresh
 
         public async Task<TokensRM> Handle(SilentRefreshCommand request, CancellationToken cancellationToken)
         {
-            var account = await accountsDb.Accounts.SingleOrDefaultAsync(x => x.Id == request.UserId.ToString());
+            var account = await accountsDb.Accounts.SingleOrDefaultAsync(x => x.Id == request.UserId);
 
             var refreshTokenExpiresDate = LinuxTimestampConverter.LinuxTimestampToDateTime(account.RefreshTokenExpires);
 

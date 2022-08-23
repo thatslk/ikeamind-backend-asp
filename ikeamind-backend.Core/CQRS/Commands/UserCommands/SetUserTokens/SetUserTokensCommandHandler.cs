@@ -18,10 +18,10 @@ namespace ikeamind_backend.Core.CQRS.Commands.UserCommands.SetUserTokens
         : IRequestHandler<SetUserTokensCommand, TokensRM>
     {
 
-        protected readonly IIkeaAccountsContext accountsDb;
+        protected readonly IIkeaMindAccountsContext accountsDb;
         protected readonly TokenGenerators _tokenGenerators;
         public SetUserTokensCommandHandler
-            (IIkeaAccountsContext accountsContext, 
+            (IIkeaMindAccountsContext accountsContext, 
             TokenGenerators tokenGenerators)
         {
             accountsDb = accountsContext;
@@ -30,7 +30,7 @@ namespace ikeamind_backend.Core.CQRS.Commands.UserCommands.SetUserTokens
 
         public async Task<TokensRM> Handle(SetUserTokensCommand request, CancellationToken cancellationToken)
         {
-            var account = await accountsDb.Accounts.SingleOrDefaultAsync(x => x.Id == request.UserId.ToString());
+            var account = await accountsDb.Accounts.SingleOrDefaultAsync(x => x.Id == request.UserId);
             if(!string.IsNullOrEmpty(account.RefreshToken))
             {
                 var refreshTokenExpiresDate = LinuxTimestampConverter.LinuxTimestampToDateTime(account.RefreshTokenExpires);

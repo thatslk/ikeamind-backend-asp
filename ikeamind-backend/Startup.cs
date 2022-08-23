@@ -64,30 +64,22 @@ namespace ikeamind_backend
                     .AllowAnyMethod()
                     .AllowAnyHeader());
             });
-
-            services.AddDbContext<IkeaProductsContext>(
+            
+            services.AddDbContext<IkeaMindAccountsContext>(
                 options => {
-                    options.UseSqlite(Configuration.GetConnectionString("IkeaDb"));
+                    options.UseNpgsql(Configuration.GetConnectionString("IkeaAccounts"));
                 });
 
-            services.AddDbContext<IkeaUsersContext>(
+            services.AddDbContext<IkeaProductsAndUsersContext>(
                 options => {
-                    options.UseSqlite(Configuration.GetConnectionString("IkeaUsers"));
+                    options.UseNpgsql(Configuration.GetConnectionString("IkeaProductsAndUsers"));
                 });
 
-            services.AddDbContext<IkeaJwtAccountsContext>(
-                options => {
-                    options.UseSqlite(Configuration.GetConnectionString("IkeaAccounts"));
-                });
+            services.AddScoped<IIkeaMindAccountsContext>(provider =>
+                provider.GetService<IkeaMindAccountsContext>());
 
-            services.AddScoped<IIkeaDbContext>(provider =>
-                provider.GetService<IkeaProductsContext>());
-
-            services.AddScoped<IIkeaUsersContext>(provider =>
-                provider.GetService<IkeaUsersContext>());
-
-            services.AddScoped<IIkeaAccountsContext>(provider =>
-                provider.GetService<IkeaJwtAccountsContext>());
+            services.AddScoped<IIkeaProductsAndUsersContext>(provider =>
+                provider.GetService<IkeaProductsAndUsersContext>());
 
             services.AddCoreInjections();
         }

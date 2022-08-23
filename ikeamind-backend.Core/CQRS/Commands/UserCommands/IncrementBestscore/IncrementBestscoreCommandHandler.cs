@@ -17,23 +17,23 @@ namespace ikeamind_backend.Core.CQRS.Commands.UserCommands.IncrementBestscore
     public class IncrementBestscoreCommandHandler
         : IRequestHandler<IncrementBestscoreCommand, Unit>
     {
-        protected readonly IIkeaUsersContext db;
-        public IncrementBestscoreCommandHandler(IIkeaUsersContext context)
+        protected readonly IIkeaProductsAndUsersContext db;
+        public IncrementBestscoreCommandHandler(IIkeaProductsAndUsersContext context)
         {
             db = context;
         }
 
         public async Task<Unit> Handle(IncrementBestscoreCommand request, CancellationToken cancellationToken)
         {
-            var user = await db.Users.SingleAsync(x => x.Id == request.UserId.ToString());
+            var user = await db.Users.SingleAsync(x => x.Id == request.UserId);
 
             switch (request.GameMode)
             {
                 case (GameModesEnum.TitleFirst):
-                    user.BestscoreIf++;
+                    user.BestscoreTf++;
                     break;
                 case (GameModesEnum.PictureFirst):
-                    user.BescorePf++;
+                    user.BestscorePf++;
                     break;
                 default:
                     break;

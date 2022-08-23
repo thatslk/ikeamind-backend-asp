@@ -17,11 +17,11 @@ namespace ikeamind_backend.Core.CQRS.Queries.UserQueries.CreateUser
     public class CreateUserQueryHandler
         : IRequestHandler<CreateUserQuery, Account>
     {
-        protected readonly IIkeaUsersContext usersDb;
-        protected readonly IIkeaAccountsContext accountsDb;
+        protected readonly IIkeaProductsAndUsersContext usersDb;
+        protected readonly IIkeaMindAccountsContext accountsDb;
         public CreateUserQueryHandler
-            (IIkeaUsersContext userContext,
-            IIkeaAccountsContext accountsContext)
+            (IIkeaProductsAndUsersContext userContext,
+            IIkeaMindAccountsContext accountsContext)
         {
             usersDb = userContext;
             accountsDb = accountsContext;
@@ -29,7 +29,7 @@ namespace ikeamind_backend.Core.CQRS.Queries.UserQueries.CreateUser
 
         public async Task<Account> Handle(CreateUserQuery request, CancellationToken cancellationToken)
         {
-            var newUserId = Guid.NewGuid().ToString();
+            var newUserId = Guid.NewGuid();
             var accountToAdd = new Account
             {
                 Id = newUserId,
@@ -45,8 +45,8 @@ namespace ikeamind_backend.Core.CQRS.Queries.UserQueries.CreateUser
                 Id = newUserId,
                 Username = request.Username,
                 AvatarId = 1,
-                BescorePf = 0,
-                BestscoreIf = 0
+                BestscoreTf = 0,
+                BestscorePf = 0
             };
 
             await usersDb.Users.AddAsync(userToAdd);
