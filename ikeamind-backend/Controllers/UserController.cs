@@ -13,6 +13,7 @@ using System;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using static ikeamind_backend.Core.Constants.ErrorMessagesConstants;
 
 namespace ikeamind_backend.Controllers
 {
@@ -50,7 +51,7 @@ namespace ikeamind_backend.Controllers
             var userId = Guid.Parse(User.Claims.Single(x => x.Type == ClaimTypes.NameIdentifier).Value);
             var result = await _mediator.Send(new SetUserAvatarCommand { UserId = userId, NewAvatarId = avatarId });
             if(!result)
-                return BadRequest("Указан несуществующий аватар");
+                return BadRequest(ERR_US_INVALID_AVATARID);
             else 
                 return Ok();
         }
@@ -59,10 +60,13 @@ namespace ikeamind_backend.Controllers
         [Authorize]
         public async Task<IActionResult> SetUserName(string username)
         {
+            if(string.IsNullOrEmpty(username))
+                return BadRequest(ERR_US_EMPTY_USERNAME);
+
             var userId = Guid.Parse(User.Claims.Single(x => x.Type == ClaimTypes.NameIdentifier).Value);
             var result = await _mediator.Send(new SetUserNameCommand { UserId = userId, NewUserName = username });
             if (!result)
-                return BadRequest("Пробелы в имени пользователя не поддерживаются");
+                return BadRequest(ERR_US_SPACES_IN_USERNAME);
             else
                 return Ok();
         }

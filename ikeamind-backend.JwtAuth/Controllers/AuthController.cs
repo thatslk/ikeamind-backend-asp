@@ -3,10 +3,8 @@ using ikeamind_backend.Core.CQRS.Commands.UserCommands.SilentRefresh;
 using ikeamind_backend.Core.CQRS.Queries.UserQueries.AuthenticateUser;
 using ikeamind_backend.Core.CQRS.Queries.UserQueries.CreateUser;
 using ikeamind_backend.Core.CQRS.Queries.UserQueries.IsUsernameTaken;
-using ikeamind_backend.Core.Models.EFModels.AccountModels;
 using ikeamind_backend.Core.Services;
 using MediatR;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -15,6 +13,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using static ikeamind_backend.Core.Constants.ErrorMessagesConstants;
 
 
 namespace ikeamind_backend.JwtAuth.Controllers
@@ -34,37 +33,43 @@ namespace ikeamind_backend.JwtAuth.Controllers
         [HttpPost("[action]")]
         public async Task<IActionResult> Login(string username, string password)
         {
-            if(username.Contains(' '))
+            if (string.IsNullOrEmpty(username))
+                return BadRequest(ERR_US_EMPTY_USERNAME);
+
+            if (username.Contains(' '))
             {
-                return BadRequest("Пробелы в имени пользователя не поддерживаются");
+                return BadRequest(ERR_US_SPACES_IN_USERNAME);
             }
 
             var account = await _mediator.Send(new AuthenticateUserQuery { Username = username, Password = password });
             if (account == null)
             {
-                return BadRequest("Пользователь с таким данными не найден");
+                return BadRequest(ERR_US_USER_NOTFOUND);
             }
 
-            var tokens = await _mediator.Send(new SetUserTokensCommand { UserId = Guid.Parse(account.Id) });
+            var tokens = await _mediator.Send(new SetUserTokensCommand { UserId = account.Id });
             return Ok(tokens);
         }
 
         [HttpPost("[action]")]
         public async Task<IActionResult> Signup(string username, string password)
         {
+            if (string.IsNullOrEmpty(username))
+                return BadRequest(ERR_US_EMPTY_USERNAME);
+
             if (username.Contains(' '))
             {
-                return BadRequest("Пробелы в имени пользователя не поддерживаются");
+                return BadRequest(ERR_US_SPACES_IN_USERNAME);
             }
 
             if (await _mediator.Send(new IsUsernameTakenQuery { Username = username }))
             {
-                return BadRequest("Пользовтель с указанным логином уже существует");
+                return BadRequest(ERR_US_USER_ALREADY_EXISTS);
             }
 
             var createdAccount = await _mediator.Send(new CreateUserQuery { Username = username, Password = password });
 
-            var tokens = await _mediator.Send(new SetUserTokensCommand { UserId = Guid.Parse(createdAccount.Id) });
+            var tokens = await _mediator.Send(new SetUserTokensCommand { UserId = createdAccount.Id });
             return Ok(tokens);
         }
 
