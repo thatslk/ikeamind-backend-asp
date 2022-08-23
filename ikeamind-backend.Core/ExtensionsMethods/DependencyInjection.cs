@@ -12,6 +12,7 @@ namespace ikeamind_backend.Core.ExtensionsMethods
         {
             services.AddMediatR(Assembly.GetExecutingAssembly());
             services.AddTransient<TokenGenerators>();
+            services.AddTransient<ExtractPrincipalFromExpiredToken>();
             return services;
         }
     }

@@ -7,9 +7,7 @@ using ikeamind_backend.Core.Services;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
 using System;
-using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -24,10 +22,15 @@ namespace ikeamind_backend.JwtAuth.Controllers
     {
         private readonly IMediator _mediator;
         private readonly IOptions<AuthOptions> _authOptions;
-        public AuthController(IMediator mediator, IOptions<AuthOptions> authOptions)
+        private readonly ExtractPrincipalFromExpiredToken _expiredTokenExtractor;
+        public AuthController
+            (IMediator mediator, 
+            IOptions<AuthOptions> authOptions,
+            ExtractPrincipalFromExpiredToken expiredTokenExtractor)
         {
             _mediator = mediator;
             _authOptions = authOptions;
+            _expiredTokenExtractor = expiredTokenExtractor;
         }
 
         [HttpPost("[action]")]
@@ -81,7 +84,7 @@ namespace ikeamind_backend.JwtAuth.Controllers
                 return BadRequest();
             }
 
-            var principal = GetPrincipalFromExpiredToken(accessToken);
+            var principal = _expiredTokenExtractor.GetPrincipalFromExpiredToken(accessToken);
             if (principal == null)
             {
                 return BadRequest();
@@ -98,27 +101,6 @@ namespace ikeamind_backend.JwtAuth.Controllers
             return Ok(tokens);
 
         }
-
-        private ClaimsPrincipal GetPrincipalFromExpiredToken(string token)
-        {
-            var tokenValidationParameters = new TokenValidationParameters
-            {
-                ValidateAudience = false,
-                ValidateIssuer = false,
-                ValidateIssuerSigningKey = true,
-                IssuerSigningKey = _authOptions.Value.GetSymmetricSecurityKey(),
-                ValidateLifetime = false
-            };
-
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var principal = tokenHandler.ValidateToken(token, tokenValidationParameters, out SecurityToken securityToken);
-            if (securityToken is not JwtSecurityToken jwtSecurityToken || !jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
-                throw new SecurityTokenException("Invalid token");
-
-            return principal;
-
-        }
-
 
     }
 }
