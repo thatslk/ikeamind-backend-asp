@@ -9,9 +9,9 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace ikeamind_backend.Core.CQRS.Queries.GetNextRandomProducts
+namespace ikeamind_backend.Core.CQRS.Queries.IkeaProductQueries.GetNextRandomProducts
 {
-    public class GetNextRandomProductsQuery: IRequest<List<AbstractIkeaProduct>>
+    public class GetNextRandomProductsQuery : IRequest<List<AbstractIkeaProduct>>
     {
         public int Amount { get; set; }
         public DBLocalesEnum Locale{ get; set; }
@@ -21,7 +21,7 @@ namespace ikeamind_backend.Core.CQRS.Queries.GetNextRandomProducts
         : AbstractCQRSHandler, IRequestHandler<GetNextRandomProductsQuery, List<AbstractIkeaProduct>>
     {
         public GetNextRandomProductsQueryHandler
-            (IIkeaDbContext context) : base(context) { }
+            (IIkeaProductsAndUsersContext context) : base(context) { }
 
         public async Task<List<AbstractIkeaProduct>> Handle(GetNextRandomProductsQuery request, CancellationToken cancellationToken)
         {
@@ -36,10 +36,10 @@ namespace ikeamind_backend.Core.CQRS.Queries.GetNextRandomProducts
                     selectedTable = db.IkeaUs;
                     break;
                 case (DBLocalesEnum.se):
-                    selectedTable = db.IkeaSe;
+                    selectedTable = db.IkeaSes;
                     break;
                 case (DBLocalesEnum.ru):
-                    selectedTable = db.IkeaRu;
+                    selectedTable = db.IkeaRus;
                     break;
                 default:
                     selectedTable = db.IkeaUs;

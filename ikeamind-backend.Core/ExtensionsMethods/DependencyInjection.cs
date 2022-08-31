@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using ikeamind_backend.Core.Services;
+using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 
@@ -10,6 +11,8 @@ namespace ikeamind_backend.Core.ExtensionsMethods
             this IServiceCollection services)
         {
             services.AddMediatR(Assembly.GetExecutingAssembly());
+            services.AddTransient<TokenGenerators>();
+            services.AddTransient<ExtractPrincipalFromExpiredToken>();
             return services;
         }
     }

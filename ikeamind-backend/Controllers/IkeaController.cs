@@ -1,10 +1,12 @@
-﻿using ikeamind_backend.Core.CQRS.Queries.GetNextRandomProducts;
+﻿using ikeamind_backend.Core.CQRS.Queries.IkeaProductQueries.GetNextRandomProducts;
 using ikeamind_backend.Core.Enums;
 using ikeamind_backend.Core.Models.ReturnModels;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace ikeamind_backend.Controllers
