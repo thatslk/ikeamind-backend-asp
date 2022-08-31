@@ -3,7 +3,8 @@
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
     <RootNamespace>ikeamind_backend</RootNamespace>
-    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+    
+    <UserSecretsId>cd062a7a-7645-4964-b952-7a5009b460bf</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
@@ -30,6 +31,10 @@
     <None Update="IkeaProducts.db">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="wwwroot\images\AvatarIcons\" />
   </ItemGroup>
 
 

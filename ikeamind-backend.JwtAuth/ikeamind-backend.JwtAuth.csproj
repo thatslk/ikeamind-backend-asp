@@ -3,11 +3,14 @@
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
     <RootNamespace>ikeamind_backend.JwtAuth</RootNamespace>
+    <UserSecretsId>08a010e8-1637-4464-9065-ee1e390200ad</UserSecretsId>
+    
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="MediatR" Version="10.0.1" />
     <PackageReference Include="Microsoft.IdentityModel.JsonWebTokens" Version="6.22.0" />
+    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.11.1" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="5.6.3" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.22.0" />
   </ItemGroup>
